@@ -2,40 +2,43 @@ using System.Collections.Generic;
 using TMPro;
 using UI;
 using UnityEngine;
-using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour
 {
-    [SerializeField] private StartWindow _startWindow;
 
     private List<QuestionsConfig> _questions;
 
-    public TextMeshProUGUI questionText;
-    public TextMeshProUGUI answerTextA;
-    public TextMeshProUGUI answerTextB;
-    public TextMeshProUGUI answerTextC;
-    public TextMeshProUGUI answerTextD;
-    public Button answerA;
-    public Button answerB;
-    public Button answerC;
-    public Button answerD;
+    [SerializeField] private TextMeshProUGUI _questionText;
+    [SerializeField] private AnswerButton _answerA;
+    [SerializeField] private AnswerButton _answerB;
+    [SerializeField] private AnswerButton _answerC;
+    [SerializeField] private AnswerButton _answerD;
+    [SerializeField] private ClickableGameScreen _startWindow;
+    [SerializeField] private ClickableGameScreen _wrongAnswerWindow;
+    [SerializeField] private ClickableGameScreen _timerLossWindow;
+    [SerializeField] private ClickableGameScreen _victoryWindow;
+    [SerializeField] private GameScreen _blockClickPanel;
+    [SerializeField] private Timer _timer;
 
-
-    public QuestionsConfig currentQuestion;
+    private QuestionsConfig _currentQuestion;
     private void Start()
     {
         _startWindow.Init();
+        _startWindow.Show();
+        _wrongAnswerWindow.Init();
+        _timerLossWindow.Init();
+        _victoryWindow.Init();
         LoadResources();
-        answerA.onClick.AddListener(SetAnswerA);
-        answerB.onClick.AddListener(SetAnswerB);
-        answerC.onClick.AddListener(SetAnswerC);
-        answerD.onClick.AddListener(SetAnswerD);
-
-        GetRandomQuestion();
-        InsertValue();
+        _answerA.button.onClick.AddListener(SetAnswerA);
+        _answerB.button.onClick.AddListener(SetAnswerB);
+        _answerC.button.onClick.AddListener(SetAnswerC);
+        _answerD.button.onClick.AddListener(SetAnswerD);
+        _currentQuestion = GetRandomQuestion();
+        InsertValue(_currentQuestion);
     }
 
-    public void LoadResources()
+    private void LoadResources()
     {
         _questions = new List<QuestionsConfig>();
         var resources = Resources.LoadAll<QuestionsConfig>("QuestionConfig");
@@ -44,64 +47,88 @@ public class GameController : MonoBehaviour
             _questions.Add(resources[i]);
         }
     }
-    public void GetRandomQuestion()
+    private QuestionsConfig GetRandomQuestion()
     {
-        if (_questions.Count > 1)
-        {
-            currentQuestion = _questions[Random.Range(0, _questions.Count)];
-        }
-        else
-        {
-            _startWindow.Show("Ви відповіли на Всі запитання. \n Вітаємо з перемогою у вікторині!");
-        }
+        if (_questions.Count == 0) return null;
+        _currentQuestion = _questions[Random.Range(0, _questions.Count)];
+        return _currentQuestion;
     }
 
-    public void RemoveQuestion()
+    private void RemoveQuestion()
     {
-        _questions.Remove(currentQuestion);
+        _questions.Remove(_currentQuestion);
     }
-    public void InsertValue()
+    private void InsertValue(QuestionsConfig config)
     {
-        questionText.text = currentQuestion.question;
-        answerTextA.text = currentQuestion.answerA;
-        answerTextB.text = currentQuestion.answerB;
-        answerTextC.text = currentQuestion.answerC;
-        answerTextD.text = currentQuestion.answerD;
+        _questionText.text = config.question;
+        _answerA.message.text = config.answerA;
+        _answerA.isCorrectAnswer = config.isAnswerACorrect;
+        _answerB.message.text = config.answerB;
+        _answerB.isCorrectAnswer = config.isAnswerBCorrect;
+        _answerC.message.text = config.answerC;
+        _answerC.isCorrectAnswer = config.isAnswerCCorrect;
+        _answerD.message.text = config.answerD;
+        _answerD.isCorrectAnswer = config.isAnswerDCorrect;
+
     }
 
-    public void CheckAnswer(TextMeshProUGUI answerText)  //string
+    private void CheckAnswer(AnswerButton button)
     {
-        if (currentQuestion.correctAnswer == answerText.text)
+        StartCoroutine(button.ChangeColor((() =>
         {
-            RemoveQuestion();
-            GetRandomQuestion();
-            InsertValue();
-        }
-        else
+            if (button.isCorrectAnswer)
+            {
+                RemoveQuestion();
+                GetRandomQuestion();
+                InsertValue(_currentQuestion);
+                _blockClickPanel.Hide();
+                _timer.Refresh();
+                button.ResetColor();
+            }
+            else
+            {
+                _questions.Clear();
+                LoadResources();
+                GetRandomQuestion();
+                InsertValue(_currentQuestion);
+                _blockClickPanel.Hide();
+                _wrongAnswerWindow.Show();
+                _timer.Refresh();
+                button.ResetColor();
+            }
+        })));
+    }
+    private void SetAnswerA()
+    {
+        CheckAnswer(_answerA);
+    }
+    private void SetAnswerB()
+    {
+        CheckAnswer(_answerB);
+    }
+    private void SetAnswerC()
+    {
+        CheckAnswer(_answerC);
+    }
+    private void SetAnswerD()
+    {
+        CheckAnswer(_answerD);
+    }
+    private void Update()
+    {
+        _timer.TickTimer();
+        
+        if (_timer.time <= 0)
         {
-            _questions.Clear();
-            LoadResources();
-            _startWindow.Show("Нажаль Ви помилилися, \n спробуємо ще? \n Натисніть, будь-куди");
+            _timerLossWindow.Show();
+            _timer.Refresh();
+            InsertValue(GetRandomQuestion());
+        }
+        if (_currentQuestion == null)
+        {
+            _victoryWindow.Show();
         }
     }
-    public void SetAnswerA()
-    {
-        CheckAnswer(answerTextA);
-    }
-    public void SetAnswerB()
-    {
-        CheckAnswer(answerTextB);
-    }
-    public void SetAnswerC()
-    {
-        CheckAnswer(answerTextC);
-    }
-    public void SetAnswerD()
-    {
-        CheckAnswer(answerTextD);
-    }
-
-    
 }
 
    

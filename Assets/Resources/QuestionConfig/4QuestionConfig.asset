@@ -16,7 +16,10 @@ MonoBehaviour:
     WD40 \u0432\u0438\u043D\u0430\u0439\u0448\u043E\u0432 \u0445\u0456\u043C\u0456\u043A
     \u041D\u043E\u0440\u043C \u041B\u0430\u0440\u0441\u0435\u043D?"
   answerA: 1953
+  isAnswerACorrect: 1
   answerB: 1943
+  isAnswerBCorrect: 0
   answerC: 1899
+  isAnswerCCorrect: 0
   answerD: 1934
-  correctAnswer: 1953
+  isAnswerDCorrect: 0

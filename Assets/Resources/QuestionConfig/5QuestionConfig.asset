@@ -16,7 +16,10 @@ MonoBehaviour:
     \u0432\u043F\u0435\u0440\u0448\u0435 \u043F\u043E\u0457\u0445\u0430\u0432 \u0434\u043E
     \u0421\u0428\u0410?"
   answerA: 1964
+  isAnswerACorrect: 1
   answerB: 1946
+  isAnswerBCorrect: 0
   answerC: 1953
+  isAnswerCCorrect: 0
   answerD: 1981
-  correctAnswer: 1964
+  isAnswerDCorrect: 0

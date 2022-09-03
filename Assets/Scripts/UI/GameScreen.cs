@@ -1,34 +1,27 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace UI
 {
-    public class StartWindow : UIController
+    public class GameScreen : MonoBehaviour
     {
-        [SerializeField] private Button _button;
         [SerializeField] private CanvasGroup _canvas;
-        [SerializeField] private TextMeshProUGUI _text;
+        [SerializeField] private Timer _timer;
         
-        public void Init()
-        {
-            _button.onClick.AddListener(Hide);
-        }
-
         public void Hide()
         {
+            _timer.isTimerGo = true;
             _canvas.alpha = 0;
             _canvas.interactable = false;
             _canvas.blocksRaycasts = false;
         }
 
-        public void Show(string text)
+        public void Show()
         {
+            _timer.isTimerGo = false;
             _canvas.alpha = 1;
             _canvas.interactable = true;
             _canvas.blocksRaycasts = true;
-            _text.text = text;
         }
-
+        
     }
 }
